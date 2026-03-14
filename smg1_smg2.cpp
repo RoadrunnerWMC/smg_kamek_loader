@@ -5,6 +5,13 @@
 // Evanbowl, SuperHackio, and RoadrunnerWMC
 
 
+// Custom code will be loaded into SystemHeap. However, the space that it provides is very limited,
+// so the heaps need to be expanded early on during the game's initialization process. By default,
+// SystemHeap has enough space to fit more than 80 KB of custom code (including .text and .bss from
+// the CustomCode binaries). If our code requires more space, the loader will expand SystemHeap's
+// memory by taking away some from HeapNapa/SceneHeapNapa.
+
+
 // enable crash debugger
 kmCondWrite32(0x804B7D90, 0x98040068, 0x60000000);  // SMG2 E, P, J
 kmCondWrite32(0x804B7E54, 0x4082FFB8, 0x60000000);  // SMG2 E, P, J
