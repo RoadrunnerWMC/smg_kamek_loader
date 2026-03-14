@@ -1,6 +1,8 @@
 #include "kamekLoader.h"
 
-// originally by Ninji, with improvements by CLF78, Ryguy, and RoadrunnerWMC
+// based on the Syati loader
+// by SunakazeKun, Jonathan, Lord-Giganticus, bavario-lginc, shibboleet,
+// Evanbowl, SuperHackio, and RoadrunnerWMC
 
 #define STRINGIFY_(x) #x
 #define STRINGIFY(x) STRINGIFY_(x)
