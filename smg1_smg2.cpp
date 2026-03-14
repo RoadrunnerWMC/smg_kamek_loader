@@ -12,6 +12,11 @@
 // memory by taking away some from HeapNapa/SceneHeapNapa.
 
 
+#if !defined(SMG1) && !defined(SMG2)
+#error "must specify -DSMG1 and/or -DSMG2"
+#endif
+
+
 // enable crash debugger                               1P 1E 1J 1K 1C 2P 2E 2J 2W 2K
 // ---------------------------------------------------------------------------------
 #ifdef SMG1
