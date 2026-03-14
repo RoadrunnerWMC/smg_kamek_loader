@@ -12,16 +12,36 @@
 // memory by taking away some from HeapNapa/SceneHeapNapa.
 
 
-// enable crash debugger
-kmCondWrite32(0x804B7D90, 0x98040068, 0x60000000);  // SMG2 E, P, J
-kmCondWrite32(0x804B7E54, 0x4082FFB8, 0x60000000);  // SMG2 E, P, J
-kmCondWrite32(0x805B63A8, 0x4BFFC769, 0x60000000);  // SMG2 E, P, J
-kmCondWrite32(0x805B66B4, 0x48000160, 0x60000000);  // SMG2 E, P, J
-kmCondWrite32(0x804B7E00, 0x98040068, 0x60000000);  // SMG2 K, W
-kmCondWrite32(0x804B7EC4, 0x4082FFB8, 0x60000000);  // SMG2 K, W
-kmCondWrite32(0x805B64A8, 0x4BFFC769, 0x60000000);  // SMG2 K, W
-kmCondWrite32(0x805B67B4, 0x48000160, 0x60000000);  // SMG2 K, W
-
+// enable crash debugger                               1E 1P 1J 1K 1C 2E 2P 2J 2K 2W
+// ---------------------------------------------------------------------------------
+kmCondWrite32(0x8039AA2C, 0x98040068, 0x60000000);  // 1E    1J
+kmCondWrite32(0x8039AA48, 0x98040068, 0x60000000);  //    1P
+kmCondWrite32(0x8039BF80, 0x98040068, 0x60000000);  //          1K
+kmCondWrite32(0x804067CC, 0x98040068, 0x60000000);  //             1C
+kmCondWrite32(0x804B7D90, 0x98040068, 0x60000000);  //                2E 2P 2J
+kmCondWrite32(0x804B7E00, 0x98040068, 0x60000000);  //                         2K 2W
+// ---------------------------------------------------------------------------------
+kmCondWrite32(0x8039AAF0, 0x4082FFB8, 0x60000000);  // 1E    1J
+kmCondWrite32(0x8039AB0C, 0x4082FFB8, 0x60000000);  //    1P
+kmCondWrite32(0x8039C044, 0x4082FFB8, 0x60000000);  //          1K
+kmCondWrite32(0x804068D4, 0x4082FFB4, 0x60000000);  //             1C
+kmCondWrite32(0x804B7E54, 0x4082FFB8, 0x60000000);  //                2E 2P 2J
+kmCondWrite32(0x804B7EC4, 0x4082FFB8, 0x60000000);  //                         2K 2W
+// ---------------------------------------------------------------------------------
+kmCondWrite32(0x804A402C, 0x4BFFC941, 0x60000000);  // 1E 1P
+kmCondWrite32(0x804A400C, 0x4BFFC941, 0x60000000);  //       1J
+kmCondWrite32(0x804A626C, 0x4BFFC941, 0x60000000);  //          1K
+kmCondWrite32(0x806034D4, 0x4BFFCB1D, 0x60000000);  //             1C
+kmCondWrite32(0x805B63A8, 0x4BFFC769, 0x60000000);  //                2E 2P 2J
+kmCondWrite32(0x805B64A8, 0x4BFFC769, 0x60000000);  //                         2K 2W
+// ---------------------------------------------------------------------------------
+kmCondWrite32(0x804A432C, 0x48000160, 0x60000000);  // 1E 1P
+kmCondWrite32(0x804A430C, 0x48000160, 0x60000000);  //       1J
+kmCondWrite32(0x804A656C, 0x48000160, 0x60000000);  //          1K
+kmCondWrite32(0x806037D4, 0x48000160, 0x60000000);  //             1C
+kmCondWrite32(0x805B66B4, 0x48000160, 0x60000000);  //                2E 2P 2J
+kmCondWrite32(0x805B67B4, 0x48000160, 0x60000000);  //                         2K 2W
+// ---------------------------------------------------------------------------------
 
 
 
