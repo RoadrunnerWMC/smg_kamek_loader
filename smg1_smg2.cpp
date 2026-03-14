@@ -193,8 +193,8 @@ void unknownVersion() {
 
 union versionInfo {
 	struct {
+		u8 smg1_smg2;
 		char region;
-		u8 revision;
 	};
 	u16 pair;
 };
@@ -205,25 +205,20 @@ static const loaderFunctionsEx *sFuncs;
 versionInfo checkVersion() {
 	versionInfo version;
 
-	// default is "PALv0"
-	version.pair = 'P\0';
-	switch (*((u32*)0x800CF6CC))
+	// default is "SMG0 PAL"
+	version.pair = '\0P';
+	switch (*((u32*)0x80017FC8))
 	{
-		case 0x40820030: version.pair = 'P\1'; break;
-		case 0x40820038: version.pair = 'P\2'; break;
-		case 0x48000465: version.pair = 'E\1'; break;
-		case 0x2C030000: version.pair = 'E\2'; break;
-		case 0x480000B4: version.pair = 'J\1'; break;
-		case 0x4082000C: version.pair = 'J\2'; break;
-		case 0x38A00001:
-			switch (*((u8*)0x8000423A))
-			{
-				case 0xC8: version.region = 'K'; break;
-				case 0xAC: version.region = 'W'; break;
-				default: unknownVersion();
-			}
-			break;
-		case 0x4182000c: version.region = 'C'; break;
+		case 0x389C0008: version.pair = '\1C'; break;
+		case 0x4841A5B0: version.pair = '\1E'; break;
+		case 0x4841A5AC: version.pair = '\1J'; break;
+		case 0x90610010: version.pair = '\1K'; break;
+		case 0x4841A5CC: version.pair = '\1P'; break;
+		case 0x3884D0D4: version.pair = '\2E'; break;
+		case 0x3884C8B4: version.pair = '\2J'; break;
+		case 0x3884BF14: version.pair = '\2K'; break;
+		case 0x388427D4: version.pair = '\2P'; break;
+		case 0x3884D374: version.pair = '\2W'; break;
 		default: unknownVersion();
 	}
 
@@ -232,10 +227,7 @@ versionInfo checkVersion() {
 
 int loadBinary() {
 	char path[64];
-	if (sVersionInfo.revision == 0)
-		sFuncs->base.sprintf(path, "/Code/%c.bin", sVersionInfo.region);
-	else
-		sFuncs->base.sprintf(path, "/Code/%c%d.bin", sVersionInfo.region, sVersionInfo.revision);
+	sFuncs->base.sprintf(path, "/CustomCode/CustomCode_SB4%c.bin", sVersionInfo.region);
 	loadKamekBinaryFromDisc(&sFuncs->base, path);
 
 	return 1;
