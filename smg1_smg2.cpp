@@ -4,6 +4,20 @@
 // by SunakazeKun, Jonathan, Lord-Giganticus, bavario-lginc, shibboleet,
 // Evanbowl, SuperHackio, and RoadrunnerWMC
 
+
+// enable crash debugger
+kmCondWrite32(0x804B7D90, 0x98040068, 0x60000000);  // SMG2 E, P, J
+kmCondWrite32(0x804B7E54, 0x4082FFB8, 0x60000000);  // SMG2 E, P, J
+kmCondWrite32(0x805B63A8, 0x4BFFC769, 0x60000000);  // SMG2 E, P, J
+kmCondWrite32(0x805B66B4, 0x48000160, 0x60000000);  // SMG2 E, P, J
+kmCondWrite32(0x804B7E00, 0x98040068, 0x60000000);  // SMG2 K, W
+kmCondWrite32(0x804B7EC4, 0x4082FFB8, 0x60000000);  // SMG2 K, W
+kmCondWrite32(0x805B64A8, 0x4BFFC769, 0x60000000);  // SMG2 K, W
+kmCondWrite32(0x805B67B4, 0x48000160, 0x60000000);  // SMG2 K, W
+
+
+
+
 #define STRINGIFY_(x) #x
 #define STRINGIFY(x) STRINGIFY_(x)
 
