@@ -64,162 +64,98 @@ kmCondWrite32(0x805B67B4, 0x48000160, 0x60000000);  //                         2
 #endif
 // ---------------------------------------------------------------------------------
 
+// FUNCTION TYPEDEFS HERE
 
-
-#define STRINGIFY_(x) #x
-#define STRINGIFY(x) STRINGIFY_(x)
-
-typedef void *(*EGG_Heap_alloc_t) (u32 size, s32 align, void *heap);
-typedef void (*EGG_Heap_free_t) (void *buffer, void *heap);
-typedef void (*flush_cache_t) (void *buffer, size_t size);
+void *allocAdapter(u32 size, bool isForCode, const loaderFunctions *funcs);
+void freeAdapter(void *buffer, bool isForCode, const loaderFunctions *funcs);
 
 struct loaderFunctionsEx {
 	loaderFunctions base;
-	EGG_Heap_alloc_t EGG_Heap_alloc;
-	EGG_Heap_free_t EGG_Heap_free;
-	flush_cache_t __flush_cache;
-	void **mHeap_g_gameHeaps;
-	void **mHeap_g_archiveHeap;
-	u32* bcaCheck;
-	u32* myBackGround_PhaseMethod;
+	// MORE FUNCTIONS HERE
 };
 
-// store the base address for custom code at 0x800014e0, for optional later use (e.g. for custom exception handlers)
-extern u32 codeAddr:0x800014e0;
-
-void *allocAdapter(u32 size, bool isForCode, const loaderFunctions *funcs) {
-	const loaderFunctionsEx *funcsEx = (const loaderFunctionsEx *)funcs;
-	void **heapPtr = isForCode ? funcsEx->mHeap_g_gameHeaps : funcsEx->mHeap_g_archiveHeap;
-	void *text = funcsEx->EGG_Heap_alloc(size, 0x20, *heapPtr);
-	if (isForCode) {
-		funcs->OSReport("Code start at %p\n", text);
-		codeAddr = (u32)text;
-	}
-	return text;
-}
-void freeAdapter(void *buffer, bool isForCode, const loaderFunctions *funcs) {
-	const loaderFunctionsEx *funcsEx = (const loaderFunctionsEx *)funcs;
-	void **heapPtr = isForCode ? funcsEx->mHeap_g_gameHeaps : funcsEx->mHeap_g_archiveHeap;
-	funcsEx->EGG_Heap_free(buffer, *heapPtr);
-}
-
-
-const loaderFunctionsEx functions_p = {
-	{(OSReport_t) 0x8015F870,
-	(OSFatal_t) 0x801AF710,
-	(DVDConvertPathToEntrynum_t) 0x801CA7C0,
-	(DVDFastOpen_t) 0x801CAAD0,
-	(DVDReadPrio_t) 0x801CAC60,
-	(DVDClose_t) 0x801CAB40,
-	(sprintf_t) 0x802E1ACC,
-	(memcpy_t) 0x80004364,
+#ifdef SMG1
+const loaderFunctionsEx functions_1P_1E = {
+	{(OSReport_t) 0x804A3E94,
+	(OSFatal_t) 0x804A6C1C,
+	(DVDConvertPathToEntrynum_t) 0x804BEF5C,
+	(DVDFastOpen_t) 0x804BF264,
+	(DVDReadPrio_t) 0x804BF844,
+	(DVDClose_t) 0x804BF578,
+	(sprintf_t) 0x8051D014,
 	allocAdapter,
-	freeAdapter},
-	(EGG_Heap_alloc_t) 0x802B8E00,
-	(EGG_Heap_free_t) 0x802B90B0,
-	(flush_cache_t) 0x80004330,
-	(void **) 0x80377F48,
-	(void **) 0x8042A72C,
-	(u32*) 0x800CA0B8,
-	(u32*) 0x80328428
+	freeAdapter}
 };
-const loaderFunctionsEx functions_e = {
-	{(OSReport_t) 0x8015F730,
-	(OSFatal_t) 0x801AF5D0,
-	(DVDConvertPathToEntrynum_t) 0x801CA680,
-	(DVDFastOpen_t) 0x801CA990,
-	(DVDReadPrio_t) 0x801CAB20,
-	(DVDClose_t) 0x801CAA00,
-	(sprintf_t) 0x802E17DC,
-	(memcpy_t) 0x80004364,
+const loaderFunctionsEx functions_1J = {
+	{(OSReport_t) 0x804A3E74,
+	(OSFatal_t) 0x804A6BFC,
+	(DVDConvertPathToEntrynum_t) 0x804BEF3C,
+	(DVDFastOpen_t) 0x804BF244,
+	(DVDReadPrio_t) 0x804BF824,
+	(DVDClose_t) 0x804BF558,
+	(sprintf_t) 0x8051CFF4,
 	allocAdapter,
-	freeAdapter},
-	(EGG_Heap_alloc_t) 0x802B8CC0,
-	(EGG_Heap_free_t) 0x802B8F70,
-	(flush_cache_t) 0x80004330,
-	(void **) 0x80377C48,
-	(void **) 0x8042A44C,
-	(u32*) 0x800C9FC8,
-	(u32*) 0x803280E0
+	freeAdapter}
+};
+const loaderFunctionsEx functions_1K = {
+	{(OSReport_t) 0x804A60D4,
+	(OSFatal_t) 0x804A8298,
+	(DVDConvertPathToEntrynum_t) 0x804C13E4,
+	(DVDFastOpen_t) 0x804C16EC,
+	(DVDReadPrio_t) 0x804C1CCC,
+	(DVDClose_t) 0x804C1A00,
+	(sprintf_t) 0x8051E5A4,
+	allocAdapter,
+	freeAdapter}
+};
+const loaderFunctionsEx functions_1C = {
+	{(OSReport_t) 0x8060333C,
+	(OSFatal_t) 0x80605500,
+	(DVDConvertPathToEntrynum_t) 0x8061E4A0,
+	(DVDFastOpen_t) 0x8061E7A8,
+	(DVDReadPrio_t) 0x8061ED88,
+	(DVDClose_t) 0x8061EABC,
+	(sprintf_t) 0x8067B4AC,
+	allocAdapter,
+	freeAdapter}
+};
+#endif
+#ifdef SMG2
+const loaderFunctionsEx functions_2P_2E_2J = {
+	{(OSReport_t) 0x805B6210,
+	(OSFatal_t) 0x805B8500,
+	(DVDConvertPathToEntrynum_t) 0x805D1370,
+	(DVDFastOpen_t) 0x805D1680,
+	(DVDReadPrio_t) 0x805D1A50,
+	(DVDClose_t) 0x805D1810,
+	(sprintf_t) 0x80633CBC,
+	allocAdapter,
+	freeAdapter}
+};
+const loaderFunctionsEx functions_2W_2K = {
+	{(OSReport_t) 0x805B6310,
+	(OSFatal_t) 0x805B8600,
+	(DVDConvertPathToEntrynum_t) 0x805D1470,
+	(DVDFastOpen_t) 0x805D1780,
+	(DVDReadPrio_t) 0x805D1B50,
+	(DVDClose_t) 0x805D1910,
+	(sprintf_t) 0x8063422C,
+	allocAdapter,
+	freeAdapter}
+};
+#endif
 
-};
-const loaderFunctionsEx functions_j = {
-	{(OSReport_t) 0x8015F540,
-	(OSFatal_t) 0x801AF3E0,
-	(DVDConvertPathToEntrynum_t) 0x801CA490,
-	(DVDFastOpen_t) 0x801CA7A0,
-	(DVDReadPrio_t) 0x801CA930,
-	(DVDClose_t) 0x801CA810,
-	(sprintf_t) 0x802E15EC,
-	(memcpy_t) 0x80004364,
-	allocAdapter,
-	freeAdapter},
-	(EGG_Heap_alloc_t) 0x802B8AD0,
-	(EGG_Heap_free_t) 0x802B8D80,
-	(flush_cache_t) 0x80004330,
-	(void **) 0x803779C8,
-	(void **) 0x8042A16C,
-	(u32*) 0x800C9F48,
-	(u32*) 0x80327E48
-};
-const loaderFunctionsEx functions_k = {
-	{(OSReport_t) 0x8015FC70,
-	(OSFatal_t) 0x801AFB10,
-	(DVDConvertPathToEntrynum_t) 0x801CABC0,
-	(DVDFastOpen_t) 0x801CAED0,
-	(DVDReadPrio_t) 0x801CB060,
-	(DVDClose_t) 0x801CAF40,
-	(sprintf_t) 0x802E1D1C,
-	(memcpy_t) 0x80004364,
-	allocAdapter,
-	freeAdapter},
-	(EGG_Heap_alloc_t) 0x802B9200,
-	(EGG_Heap_free_t) 0x802B94B0,
-	(flush_cache_t) 0x80004330,
-	(void **) 0x80384948,
-	(void **) 0x804370EC,
-	(u32*) 0x800CA0D8,
-	(u32*) 0x80334E10
-};
-const loaderFunctionsEx functions_w = {
-	{(OSReport_t) 0x8015FC70,
-	(OSFatal_t) 0x801AFB10,
-	(DVDConvertPathToEntrynum_t) 0x801CABC0,
-	(DVDFastOpen_t) 0x801CAED0,
-	(DVDReadPrio_t) 0x801CB060,
-	(DVDClose_t) 0x801CAF40,
-	(sprintf_t) 0x802E1D1C,
-	(memcpy_t) 0x80004364,
-	allocAdapter,
-	freeAdapter},
-	(EGG_Heap_alloc_t) 0x802B9200,
-	(EGG_Heap_free_t) 0x802B94B0,
-	(flush_cache_t) 0x80004330,
-	(void **) 0x80382D48,
-	(void **) 0x804354EC,
-	(u32*) 0x800CA0D8,
-	(u32*) 0x803331D0
+
+union versionInfo {
+	struct {
+		u8 smg1_smg2;
+		char region;
+	};
+	u16 pair;
 };
 
-const loaderFunctionsEx functions_c = {
-	{(OSReport_t) 0x80161A90,
-	(OSFatal_t) 0x801B1930,
-	(DVDConvertPathToEntrynum_t) 0x801CC9E0,
-	(DVDFastOpen_t) 0x801CCCF0,
-	(DVDReadPrio_t) 0x801CCE80,
-	(DVDClose_t) 0x801CCD60,
-	(sprintf_t) 0x802E4DF8,
-	(memcpy_t) 0x80004364,
-	allocAdapter,
-	freeAdapter},
-	(EGG_Heap_alloc_t) 0x802BB360,
-	(EGG_Heap_free_t) 0x802BB610,
-	(flush_cache_t) 0x80004330,
-	(void **) 0x8037D4C8,
-	(void **) 0x8042FCCC,
-	(u32*) 0x800CA2D8,
-	(u32*) 0x8032D2F8
-};
+static versionInfo sVersionInfo;
+static const struct loaderFunctionsEx *sFuncs;
 
 void unknownVersion() {
 	// can't do much here!
@@ -232,17 +168,6 @@ void unknownVersion() {
 	for (;;);
 }
 
-union versionInfo {
-	struct {
-		u8 smg1_smg2;
-		char region;
-	};
-	u16 pair;
-};
-
-static versionInfo sVersionInfo;
-static const loaderFunctionsEx *sFuncs;
-
 versionInfo checkVersion() {
 	versionInfo version;
 
@@ -251,23 +176,95 @@ versionInfo checkVersion() {
 	switch (*((u32*)0x80017FC8))
 	{
 #ifdef SMG1
-		case 0x389C0008: version.pair = '\1C'; break;
+		case 0x4841A5CC: version.pair = '\1P'; break;
 		case 0x4841A5B0: version.pair = '\1E'; break;
 		case 0x4841A5AC: version.pair = '\1J'; break;
 		case 0x90610010: version.pair = '\1K'; break;
-		case 0x4841A5CC: version.pair = '\1P'; break;
+		case 0x389C0008: version.pair = '\1C'; break;
 #endif
 #ifdef SMG2
+		case 0x388427D4: version.pair = '\2P'; break;
 		case 0x3884D0D4: version.pair = '\2E'; break;
 		case 0x3884C8B4: version.pair = '\2J'; break;
 		case 0x3884BF14: version.pair = '\2K'; break;
-		case 0x388427D4: version.pair = '\2P'; break;
 		case 0x3884D374: version.pair = '\2W'; break;
 #endif
 		default: unknownVersion();
 	}
 
 	return version;
+}
+
+
+
+
+
+
+/*****************************************************************************************************************/
+/* Get size of CustomCode and expand SystemHeap if necessary                                                     */
+/*****************************************************************************************************************/
+static u32 sCustomCodeSize;
+
+void initCustomCodeSize(loaderFunctionsEx *funcsEx) {
+	DVDFileInfo fileHandle;
+	int pathID = DVDConvertPathToEntrynum(KAMEK_BINARY_NAME);
+
+	if (pathID < 0) {
+		sCustomCodeSize = 0;
+		return;
+	}
+
+	if (!DVDFastOpen(pathID, &fileHandle)) {
+		SyatiError("SYA_ERR\n\nCan't create file handle\n");
+	}
+
+	if (fileHandle.mLength < 32) {
+		SyatiError("SYA_ERR\n\nBinary too small\n");
+	}
+
+	u8 tempBuffer[ALIGN_32(sizeof(KamekHeader)) * 2];
+	KamekHeader *header = (KamekHeader*)ALIGN_32((u32)tempBuffer);
+
+	DVDReadPrio(&fileHandle, header, 32, 0, 2);
+	DVDClose(&fileHandle);
+
+	sCustomCodeSize = ALIGN_32(header->codeSize + header->bssSize);
+}
+
+void getCustomCodeSizeAndCreateHeaps(HeapMemoryWatcher *heapWatcher) {
+	initCustomCodeSize();
+	heapWatcher->createHeaps();
+}
+
+#if defined(SB4W) || defined(SB4K)
+kmCall(0x804BD058, getCustomCodeSizeAndCreateHeaps);
+#elif defined (SB4E) || defined(SB4P) || defined(SB4J)
+kmCall(0x804BCFE8, getCustomCodeSizeAndCreateHeaps);
+#endif
+
+
+
+
+
+
+
+
+
+void *allocAdapter(u32 size, bool isForCode, const loaderFunctions *funcs) {
+	const loaderFunctionsEx *funcsEx = (const loaderFunctionsEx *)funcs;
+	void **heapPtr = isForCode ? funcsEx->mHeap_g_gameHeaps : funcsEx->mHeap_g_archiveHeap;
+	void *text = funcsEx->EGG_Heap_alloc(size, 0x20, *heapPtr);
+	if (isForCode) {
+		funcs->OSReport("Code start at %p\n", text);
+		codeAddr = (u32)text;
+	}
+	return text;
+}
+
+void freeAdapter(void *buffer, bool isForCode, const loaderFunctions *funcs) {
+	const loaderFunctionsEx *funcsEx = (const loaderFunctionsEx *)funcs;
+	void **heapPtr = isForCode ? funcsEx->mHeap_g_gameHeaps : funcsEx->mHeap_g_archiveHeap;
+	funcsEx->EGG_Heap_free(buffer, *heapPtr);
 }
 
 int loadBinary() {
@@ -312,7 +309,7 @@ void loadIntoNSMBW() {
 
 	// modify myBackGround_PhaseMethod to load rels earlier & load the kamek binary
 	u32 temp[20];
-	sFuncs->base.memcpy(&temp, sFuncs->myBackGround_PhaseMethod, 0x50);
+	sFuncs->memcpy(&temp, sFuncs->myBackGround_PhaseMethod, 0x50);
 
 	// set rel loading functions as the first entries in the table
 	sFuncs->myBackGround_PhaseMethod[0] = temp[15];
@@ -323,7 +320,7 @@ void loadIntoNSMBW() {
 	sFuncs->myBackGround_PhaseMethod[3] = (u32)&loadBinary;
 
 	// set all the other functions
-	sFuncs->base.memcpy(&sFuncs->myBackGround_PhaseMethod[4], &temp, 0x3C);
+	sFuncs->memcpy(&sFuncs->myBackGround_PhaseMethod[4], &temp, 0x3C);
 	sFuncs->myBackGround_PhaseMethod[19] = temp[18];
 	sFuncs->myBackGround_PhaseMethod[20] = temp[19];
 
