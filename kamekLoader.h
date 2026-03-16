@@ -30,4 +30,5 @@ struct loaderFunctions {
 
 
 void kamekError(const loaderFunctions *funcs, const char *str);
+unsigned int getKamekBinaryCodeSize(const loaderFunctions *funcs, const char *path);
 void loadKamekBinaryFromDisc(const loaderFunctions *funcs, const char *path);

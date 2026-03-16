@@ -153,6 +153,14 @@ inline void cacheInvalidateAddress(u32 address) {
 }
 
 
+unsigned int getKamekBinaryCodeSizeInternal(const KBHeader *header)
+{
+    if (header->magic1 != 'Kame' || header->magic2 != 'k\0' || header->version != KM_FILE_VERSION)
+        return -1;
+    return header->codeSize + header->bssSize;
+}
+
+
 void loadKamekBinary(const loaderFunctions *funcs, const void *binary, u32 binaryLength)
 {
     const KBHeader *header = (const KBHeader *)binary;
@@ -234,6 +242,33 @@ void loadKamekBinary(const loaderFunctions *funcs, const void *binary, u32 binar
     for (Func* f = (Func*)(text + header->ctorStart); f < (Func*)(text + header->ctorEnd); f++) {
         (*f)();
     }
+}
+
+
+// Returns what the size of the eventual call to kamekAlloc() with
+// isForCode=true will be. This is intended for games that need to know
+// the exact amount of code *before* loadKamekBinaryFromDisc() is
+// called, so that they can ensure that enough heap space will be
+// available. (For example, SMG/SMG2.)
+unsigned int getKamekBinaryCodeSize(const loaderFunctions *funcs, const char *path)
+{
+    int entrynum = funcs->DVDConvertPathToEntrynum(path);
+    if (entrynum < 0)
+        return -1;
+
+    DVDHandle handle;
+    if (!funcs->DVDFastOpen(entrynum, &handle))
+        return -1;
+
+    // stack-allocated KamekHeader, with position and writable length
+    // both aligned to 32
+    u8 tempBuffer[ALIGN_32(sizeof(KamekHeader))] __attribute__ ((aligned (32)));
+    KamekHeader *header = (KamekHeader*)tempBuffer;
+
+    funcs->DVDReadPrio(&handle, header, ALIGN_32(sizeof(KamekHeader)), 0, 2);
+    funcs->DVDClose(&handle);
+
+    return getKamekBinaryCodeSizeInternal(header);
 }
 
 
