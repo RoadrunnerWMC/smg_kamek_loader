@@ -16,6 +16,8 @@
 #error "must specify -DSMG1 and/or -DSMG2"
 #endif
 
+#define ALIGN_32(a) ((a + 31) & ~31)
+
 
 // enable crash debugger                               1P 1E 1J 1K 1C 2P 2E 2J 2W 2K
 // ---------------------------------------------------------------------------------
@@ -63,6 +65,7 @@ kmCondWrite32(0x805B66B4, 0x48000160, 0x60000000);  //                2P 2E 2J
 kmCondWrite32(0x805B67B4, 0x48000160, 0x60000000);  //                         2W 2K
 #endif
 // ---------------------------------------------------------------------------------
+
 
 // FUNCTION TYPEDEFS HERE
 
@@ -120,6 +123,7 @@ const loaderFunctionsEx functions_1C = {
 	freeAdapter}
 };
 #endif
+
 #ifdef SMG2
 const loaderFunctionsEx functions_2P_2E_2J = {
 	{(OSReport_t) 0x805B6210,
@@ -148,14 +152,13 @@ const loaderFunctionsEx functions_2W_2K = {
 
 union versionInfo {
 	struct {
-		u8 smg1_smg2;
+		u8 game;
 		char region;
 	};
 	u16 pair;
 };
 
 static versionInfo sVersionInfo;
-static const struct loaderFunctionsEx *sFuncs;
 
 void unknownVersion() {
 	// can't do much here!
@@ -168,71 +171,91 @@ void unknownVersion() {
 	for (;;);
 }
 
-versionInfo checkVersion() {
-	versionInfo version;
-
-	// default is "SMG0 PAL"
-	version.pair = '\0P';
+void setVersionInfo() {
 	switch (*((u32*)0x80017FC8))
 	{
 #ifdef SMG1
-		case 0x4841A5CC: version.pair = '\1P'; break;
-		case 0x4841A5B0: version.pair = '\1E'; break;
-		case 0x4841A5AC: version.pair = '\1J'; break;
-		case 0x90610010: version.pair = '\1K'; break;
-		case 0x389C0008: version.pair = '\1C'; break;
+		case 0x4841A5CC: sVersionInfo.pair = '\1P'; break;
+		case 0x4841A5B0: sVersionInfo.pair = '\1E'; break;
+		case 0x4841A5AC: sVersionInfo.pair = '\1J'; break;
+		case 0x90610010: sVersionInfo.pair = '\1K'; break;
+		case 0x389C0008: sVersionInfo.pair = '\1C'; break;
 #endif
 #ifdef SMG2
-		case 0x388427D4: version.pair = '\2P'; break;
-		case 0x3884D0D4: version.pair = '\2E'; break;
-		case 0x3884C8B4: version.pair = '\2J'; break;
-		case 0x3884BF14: version.pair = '\2K'; break;
-		case 0x3884D374: version.pair = '\2W'; break;
+		case 0x388427D4: sVersionInfo.pair = '\2P'; break;
+		case 0x3884D0D4: sVersionInfo.pair = '\2E'; break;
+		case 0x3884C8B4: sVersionInfo.pair = '\2J'; break;
+		case 0x3884BF14: sVersionInfo.pair = '\2K'; break;
+		case 0x3884D374: sVersionInfo.pair = '\2W'; break;
 #endif
 		default: unknownVersion();
 	}
-
-	return version;
 }
 
 
+static const struct loaderFunctionsEx *sFuncs;
+
+void setFuncs() {
+	switch (sVersionInfo.pair) {
+#ifdef SMG1
+		case '\1P':
+		case '\1E': sFuncs = &functions_1P_1E; break;
+		case '\1J': sFuncs = &functions_1J; break;
+		case '\1K': sFuncs = &functions_1K; break;
+		case '\1C': sFuncs = &functions_1C; break;
+#endif
+#ifdef SMG2
+		case '\2P':
+		case '\2E':
+		case '\2J': sFuncs = &functions_2P_2E_2J; break;
+		case '\2K':
+		case '\2W': sFuncs = &functions_2W_2K; break;
+#endif
+	}
+}
 
 
+// "X"s are filled in by setKamekBinaryName()
+#if defined(SMG2) && !defined(SMG1)
+static const char *sKamekBinaryName = "/Code/SB4X01.bin";
+#else
+static const char *sKamekBinaryName = "/Code/RMGX01.bin";
+#endif
+#define KAMEK_BINARY_NAME_GAME_ID_OFFSET 6
+
+void setKamekBinaryName() {
+	// If we're built to support both games, add an additional runtime
+	// check for the game
+#if defined(SMG1) && defined(SMG2)
+	// sKamekBinaryName refers to SMG1 by default in this configuration,
+	// so we only have to overwrite it if that's wrong
+	if (sVersionInfo.game == 2) {
+		sKamekBinaryName[KAMEK_BINARY_NAME_GAME_ID_OFFSET + 0] = 'S';
+		sKamekBinaryName[KAMEK_BINARY_NAME_GAME_ID_OFFSET + 1] = 'B';
+		sKamekBinaryName[KAMEK_BINARY_NAME_GAME_ID_OFFSET + 2] = '4';
+	}
+#endif
+
+	sKamekBinaryName[KAMEK_BINARY_NAME_GAME_ID_OFFSET + 3] = sVersionInfo.region;
+}
+
+
+static u32 sCodeSize;
+
+void setCodeSize() {
+	sCodeSize = getKamekBinaryCodeSize(sFuncs, sKamekBinaryName);
+}
 
 
 /*****************************************************************************************************************/
 /* Get size of CustomCode and expand SystemHeap if necessary                                                     */
 /*****************************************************************************************************************/
-static u32 sCustomCodeSize;
-
-void initCustomCodeSize(loaderFunctionsEx *funcsEx) {
-	DVDFileInfo fileHandle;
-	int pathID = DVDConvertPathToEntrynum(KAMEK_BINARY_NAME);
-
-	if (pathID < 0) {
-		sCustomCodeSize = 0;
-		return;
-	}
-
-	if (!DVDFastOpen(pathID, &fileHandle)) {
-		SyatiError("SYA_ERR\n\nCan't create file handle\n");
-	}
-
-	if (fileHandle.mLength < 32) {
-		SyatiError("SYA_ERR\n\nBinary too small\n");
-	}
-
-	u8 tempBuffer[ALIGN_32(sizeof(KamekHeader)) * 2];
-	KamekHeader *header = (KamekHeader*)ALIGN_32((u32)tempBuffer);
-
-	DVDReadPrio(&fileHandle, header, 32, 0, 2);
-	DVDClose(&fileHandle);
-
-	sCustomCodeSize = ALIGN_32(header->codeSize + header->bssSize);
-}
 
 void getCustomCodeSizeAndCreateHeaps(HeapMemoryWatcher *heapWatcher) {
-	initCustomCodeSize();
+	setVersionInfo();
+	setFuncs();
+	setKamekBinaryName();
+	setCodeSize();
 	heapWatcher->createHeaps();
 }
 
