@@ -19,52 +19,52 @@
 #define ALIGN_32(a) ((a + 31) & ~31)
 
 
-// enable crash debugger                               1P 1E 1J 1K 1C 2P 2E 2J 2W 2K
-// ---------------------------------------------------------------------------------
+// enable crash debugger                    1P 1E 1J 1K 1C 2P 2E 2J 2W 2K
+// ----------------------------------------------------------------------
 #ifdef SMG1
-kmCondWrite32(0x8039AA48, 0x98040068, 0x60000000);  // 1P
-kmCondWrite32(0x8039AA2C, 0x98040068, 0x60000000);  //    1E 1J
-kmCondWrite32(0x8039BF80, 0x98040068, 0x60000000);  //          1K
-kmCondWrite32(0x804067CC, 0x98040068, 0x60000000);  //             1C
+kmCondWriteNop(0x8039AA48, 0x98040068);  // 1P
+kmCondWriteNop(0x8039AA2C, 0x98040068);  //    1E 1J
+kmCondWriteNop(0x8039BF80, 0x98040068);  //          1K
+kmCondWriteNop(0x804067CC, 0x98040068);  //             1C
 #endif
 #ifdef SMG2
-kmCondWrite32(0x804B7D90, 0x98040068, 0x60000000);  //                2P 2E 2J
-kmCondWrite32(0x804B7E00, 0x98040068, 0x60000000);  //                         2W 2K
+kmCondWriteNop(0x804B7D90, 0x98040068);  //                2P 2E 2J
+kmCondWriteNop(0x804B7E00, 0x98040068);  //                         2W 2K
 #endif
-// ---------------------------------------------------------------------------------
+// ----------------------------------------------------------------------
 #ifdef SMG1
-kmCondWrite32(0x8039AB0C, 0x4082FFB8, 0x60000000);  // 1P
-kmCondWrite32(0x8039AAF0, 0x4082FFB8, 0x60000000);  //    1E 1J
-kmCondWrite32(0x8039C044, 0x4082FFB8, 0x60000000);  //          1K
-kmCondWrite32(0x804068D4, 0x4082FFB4, 0x60000000);  //             1C
+kmCondWriteNop(0x8039AB0C, 0x4082FFB8);  // 1P
+kmCondWriteNop(0x8039AAF0, 0x4082FFB8);  //    1E 1J
+kmCondWriteNop(0x8039C044, 0x4082FFB8);  //          1K
+kmCondWriteNop(0x804068D4, 0x4082FFB4);  //             1C
 #endif
 #ifdef SMG2
-kmCondWrite32(0x804B7E54, 0x4082FFB8, 0x60000000);  //                2P 2E 2J
-kmCondWrite32(0x804B7EC4, 0x4082FFB8, 0x60000000);  //                         2W 2K
+kmCondWriteNop(0x804B7E54, 0x4082FFB8);  //                2P 2E 2J
+kmCondWriteNop(0x804B7EC4, 0x4082FFB8);  //                         2W 2K
 #endif
-// ---------------------------------------------------------------------------------
+// ----------------------------------------------------------------------
 #ifdef SMG1
-kmCondWrite32(0x804A402C, 0x4BFFC941, 0x60000000);  // 1P 1E
-kmCondWrite32(0x804A400C, 0x4BFFC941, 0x60000000);  //       1J
-kmCondWrite32(0x804A626C, 0x4BFFC941, 0x60000000);  //          1K
-kmCondWrite32(0x806034D4, 0x4BFFCB1D, 0x60000000);  //             1C
+kmCondWriteNop(0x804A402C, 0x4BFFC941);  // 1P 1E
+kmCondWriteNop(0x804A400C, 0x4BFFC941);  //       1J
+kmCondWriteNop(0x804A626C, 0x4BFFC941);  //          1K
+kmCondWriteNop(0x806034D4, 0x4BFFCB1D);  //             1C
 #endif
 #ifdef SMG2
-kmCondWrite32(0x805B63A8, 0x4BFFC769, 0x60000000);  //                2P 2E 2J
-kmCondWrite32(0x805B64A8, 0x4BFFC769, 0x60000000);  //                         2W 2K
+kmCondWriteNop(0x805B63A8, 0x4BFFC769);  //                2P 2E 2J
+kmCondWriteNop(0x805B64A8, 0x4BFFC769);  //                         2W 2K
 #endif
-// ---------------------------------------------------------------------------------
+// ----------------------------------------------------------------------
 #ifdef SMG1
-kmCondWrite32(0x804A432C, 0x48000160, 0x60000000);  // 1P 1E
-kmCondWrite32(0x804A430C, 0x48000160, 0x60000000);  //       1J
-kmCondWrite32(0x804A656C, 0x48000160, 0x60000000);  //          1K
-kmCondWrite32(0x806037D4, 0x48000160, 0x60000000);  //             1C
+kmCondWriteNop(0x804A432C, 0x48000160);  // 1P 1E
+kmCondWriteNop(0x804A430C, 0x48000160);  //       1J
+kmCondWriteNop(0x804A656C, 0x48000160);  //          1K
+kmCondWriteNop(0x806037D4, 0x48000160);  //             1C
 #endif
 #ifdef SMG2
-kmCondWrite32(0x805B66B4, 0x48000160, 0x60000000);  //                2P 2E 2J
-kmCondWrite32(0x805B67B4, 0x48000160, 0x60000000);  //                         2W 2K
+kmCondWriteNop(0x805B66B4, 0x48000160);  //                2P 2E 2J
+kmCondWriteNop(0x805B67B4, 0x48000160);  //                         2W 2K
 #endif
-// ---------------------------------------------------------------------------------
+// ----------------------------------------------------------------------
 
 
 // FUNCTION TYPEDEFS HERE
@@ -258,6 +258,8 @@ void getCustomCodeSizeAndCreateHeaps(HeapMemoryWatcher *heapWatcher) {
 	setCodeSize();
 	heapWatcher->createHeaps();
 }
+
+
 
 #if defined(SB4W) || defined(SB4K)
 kmCall(0x804BD058, getCustomCodeSizeAndCreateHeaps);
